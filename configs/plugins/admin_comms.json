@@ -1,0 +1,28 @@
+{
+    "times": [
+        0,
+        300,
+        600,
+        900,
+        1800,
+        3600,
+        7200,
+        21600,
+        43200,
+        86400,
+        172800,
+        604800,
+        1209600
+    ],
+    "reasons": [
+        "Obscene language",
+        "Insult players",
+        "Admin disrespect",
+        "Inappropriate language",
+        "Spam",
+        "Trading",
+        "Other",
+        "Advertisement",
+        "Music in voice"
+    ]
+}
