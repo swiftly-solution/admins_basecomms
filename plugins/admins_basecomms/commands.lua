@@ -305,7 +305,7 @@ commands:Register("silence", function(playerid, args, argc, silent, prefix)
             admin and admin:CBasePlayerController().PlayerName or "CONSOLE", time * 60, reason, CommsType.Mute)
         local silenceMessage = FetchTranslation("admins.silence.message"):gsub("{ADMIN_NAME}",
             admin and admin:CBasePlayerController().PlayerName or "CONSOLE"):gsub("{PLAYER_NAME}",
-            targetPlayer:CBasePlayerController().PlayerName):gsub("{TIME}", ComputePrettyTime(time)):gsub("{REASON}",
+            targetPlayer:CBasePlayerController().PlayerName):gsub("{TIME}", ComputePrettyTime(time * 60)):gsub("{REASON}",
             reason)
         for j = 1, playermanager:GetPlayerCap() do
             ReplyToCommand(j - 1, config:Fetch("admins.prefix"), silenceMessage)
@@ -428,7 +428,7 @@ commands:Register("addmutemenu_selectplayer", function(playerid, args, argc, sil
 
     for i = 0, config:FetchArraySize("admin_comms.reasons") - 1, 1 do
         table.insert(options,
-            { config:Fetch("admin_comms.reasons[" .. i .. "]"), "sw_addgagmenu_selectreason \"" ..
+            { config:Fetch("admin_comms.reasons[" .. i .. "]"), "sw_addmutemenu_selectreason \"" ..
             config:Fetch("admin_comms.reasons[" .. i .. "]") .. "\"" })
     end
 
