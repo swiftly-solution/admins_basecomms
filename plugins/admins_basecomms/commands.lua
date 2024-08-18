@@ -49,12 +49,15 @@ commands:Register("mute", function(playerid, args, argc, silent, prefix)
 
         local alreadymuted = targetPlayer:GetVar("player_muted")
         if alreadymuted then
+            if not targetPlayer:CBasePlayerController():IsValid() then return end
             ReplyToCommand(playerid, config:Fetch("admins.prefix"),
                 FetchTranslation("admins.mute.already"):gsub("{PLAYER_NAME}",
                     targetPlayer:CBasePlayerController().PlayerName))
             goto skipnextchecks
         end
 
+        if not targetPlayer:CBasePlayerController():IsValid() then return end
+        if not admin:CBasePlayerController():IsValid() then return end
         PerformCommBan(tostring(targetPlayer:GetSteamID()), targetPlayer:CBasePlayerController().PlayerName,
             admin and tostring(admin:GetSteamID()) or "0",
             admin and admin:CBasePlayerController().PlayerName or "CONSOLE", time * 60, reason, CommsType.Mute)
@@ -105,12 +108,15 @@ commands:Register("unmute", function(playerid, args, argc, silent, prefix)
 
         local muted = targetPlayer:GetVar("player_muted")
         if not muted then
+            if not targetPlayer:CBasePlayerController():IsValid() then return end
             ReplyToCommand(playerid, config:Fetch("admins.prefix"),
                 FetchTranslation("admins.mute.inexistent"):gsub("{PLAYER_NAME}",
                     targetPlayer:CBasePlayerController().PlayerName))
             goto skipnextchecksun
         end
 
+        if not targetPlayer:CBasePlayerController():IsValid() then return end
+        if not admin:CBasePlayerController():IsValid() then return end
         PerformCommUnban(targetPlayer:GetSteamID(), CommsType.Mute)
         targetPlayer:SetVoiceFlags(VoiceFlagValue.Speak_Normal)
         ReplyToCommand(playerid, config:Fetch("admins.prefix"),
@@ -171,12 +177,15 @@ commands:Register("gag", function(playerid, args, argc, silent, prefix)
         end
         local alreadygagged = targetPlayer:GetVar("player_gagged")
         if alreadygagged then
+            if not targetPlayer:CBasePlayerController():IsValid() then return end
             ReplyToCommand(playerid, config:Fetch("admins.prefix"),
                 FetchTranslation("admins.gag.already"):gsub("{PLAYER_NAME}",
                     targetPlayer:CBasePlayerController().PlayerName))
             goto skipnextchecks1
         end
 
+        if not targetPlayer:CBasePlayerController():IsValid() then return end
+        if not admin:CBasePlayerController():IsValid() then return end
         PerformCommBan(tostring(targetPlayer:GetSteamID()), targetPlayer:CBasePlayerController().PlayerName,
             admin and tostring(admin:GetSteamID()) or "0",
             admin and admin:CBasePlayerController().PlayerName or "CONSOLE", time * 60, reason, CommsType.Gag)
@@ -226,12 +235,15 @@ commands:Register("ungag", function(playerid, args, argc, silent, prefix)
 
         local gagged = targetPlayer:GetVar("player_gagged")
         if not gagged then
+            if not targetPlayer:CBasePlayerController():IsValid() then return end
             ReplyToCommand(playerid, config:Fetch("admins.prefix"),
                 FetchTranslation("admins.gag.inexistent"):gsub("{PLAYER_NAME}",
                     targetPlayer:CBasePlayerController().PlayerName))
             goto skipnextchecksun2
         end
 
+        if not targetPlayer:CBasePlayerController():IsValid() then return end
+        if not admin:CBasePlayerController():IsValid() then return end
         PerformCommUnban(targetPlayer:GetSteamID(), CommsType.Gag)
         ReplyToCommand(playerid, config:Fetch("admins.prefix"),
             FetchTranslation("admins.ungag.message"):gsub("{ADMIN_NAME}",
@@ -291,12 +303,15 @@ commands:Register("silence", function(playerid, args, argc, silent, prefix)
         end
 
         if targetPlayer:GetVar("player_gagged") or targetPlayer:GetVar("player_muted") then
+            if not targetPlayer:CBasePlayerController():IsValid() then return end
             ReplyToCommand(playerid, config:Fetch("admins.prefix"),
                 FetchTranslation("admins.silence.already"):gsub("{PLAYER_NAME}",
                     targetPlayer:CBasePlayerController().PlayerName))
             goto skipnextchecks2
         end
 
+        if not targetPlayer:CBasePlayerController():IsValid() then return end
+        if not admin:CBasePlayerController():IsValid() then return end
         PerformCommBan(tostring(targetPlayer:GetSteamID()), targetPlayer:CBasePlayerController().PlayerName,
             admin and tostring(admin:GetSteamID()) or "0",
             admin and admin:CBasePlayerController().PlayerName or "CONSOLE", time * 60, reason, CommsType.Gag)
@@ -347,12 +362,15 @@ commands:Register("unsilence", function(playerid, args, argc, silent, prefix)
     for i = 1, #players do
         local targetPlayer = players[i]
         if not targetPlayer:GetVar("player_gagged") or not targetPlayer:GetVar("player_muted") then
+            if not targetPlayer:CBasePlayerController():IsValid() then return end
             ReplyToCommand(playerid, config:Fetch("admins.prefix"),
                 FetchTranslation("admins.silence.inexistent"):gsub("{PLAYER_NAME}",
                     targetPlayer:CBasePlayerController().PlayerName))
             goto skipnextchecks2un
         end
 
+        if not targetPlayer:CBasePlayerController():IsValid() then return end
+        if not admin:CBasePlayerController():IsValid() then return end
         PerformCommUnban(targetPlayer:GetSteamID(), CommsType.Gag)
         PerformCommUnban(targetPlayer:GetSteamID(), CommsType.Mute)
         targetPlayer:SetVoiceFlags(VoiceFlagValue.Speak_Normal)
@@ -388,7 +406,9 @@ commands:Register("addmutemenu", function(playerid, args, argc, silent, prefix)
         local pl = GetPlayer(i)
         if pl then
             if not pl:IsFakeClient() then
-                table.insert(players, { pl:CBasePlayerController().PlayerName, "sw_addmutemenu_selectplayer " .. i })
+                if pl:CBasePlayerController():IsValid() then
+                    table.insert(players, { pl:CBasePlayerController().PlayerName, "sw_addmutemenu_selectplayer " .. i })
+                end
             end
         end
     end
@@ -544,10 +564,13 @@ commands:Register("addmutemenu_confirmbox", function(playerid, args, argc, silen
 
         local alreadymuted = pl:GetVar("player_muted")
         if alreadymuted then
+            if not pl:CBasePlayerController():IsValid() then return end
             return ReplyToCommand(playerid, config:Fetch("admins.prefix"),
                 FetchTranslation("admins.mute.already"):gsub("{PLAYER_NAME}", pl:CBasePlayerController().PlayerName))
         end
 
+        if not pl:CBasePlayerController():IsValid() then return end
+        if not player:CBasePlayerController():IsValid() then return end
         local muteMessage = FetchTranslation("admins.mute.message"):gsub("{ADMIN_NAME}",
             player and player:CBasePlayerController().PlayerName):gsub("{PLAYER_NAME}",
             pl:CBasePlayerController().PlayerName):gsub("{TIME}",
@@ -592,7 +615,9 @@ commands:Register("addgagmenu", function(playerid, args, argc, silent, prefix)
         local pl = GetPlayer(i)
         if pl then
             if not pl:IsFakeClient() then
-                table.insert(players, { pl:CBasePlayerController().PlayerName, "sw_addgagmenu_selectplayer " .. i })
+                if pl:CBasePlayerController():IsValid() then
+                    table.insert(players, { pl:CBasePlayerController().PlayerName, "sw_addgagmenu_selectplayer " .. i })
+                end
             end
         end
     end
@@ -745,10 +770,13 @@ commands:Register("addgagmenu_confirmbox", function(playerid, args, argc, silent
 
         local alreadygagged = pl:GetVar("player_gagged")
         if alreadygagged then
+            if not pl:CBasePlayerController():IsValid() then return end
             return ReplyToCommand(playerid, config:Fetch("admins.prefix"),
                 FetchTranslation("admins.gag.already"):gsub("{PLAYER_NAME}", pl:CBasePlayerController().PlayerName))
         end
 
+        if not pl:CBasePlayerController():IsValid() then return end
+        if not player:CBasePlayerController():IsValid() then return end
         local gagMessage = FetchTranslation("admins.gag.message"):gsub("{ADMIN_NAME}",
             player and player:CBasePlayerController().PlayerName):gsub("{PLAYER_NAME}",
             pl:CBasePlayerController().PlayerName):gsub("{TIME}",
@@ -792,7 +820,9 @@ commands:Register("addsilencemenu", function(playerid, args, argc, silent, prefi
         local pl = GetPlayer(i)
         if pl then
             if not pl:IsFakeClient() then
-                table.insert(players, { pl:CBasePlayerController().PlayerName, "sw_addsilencemenu_selectplayer " .. i })
+                if pl:CBasePlayerController():IsValid() then
+                    table.insert(players, { pl:CBasePlayerController().PlayerName, "sw_addsilencemenu_selectplayer " .. i })
+                end
             end
         end
     end
@@ -945,11 +975,14 @@ commands:Register("addsilencemenu_confirmbox", function(playerid, args, argc, si
         end
 
         if pl:GetVar("player_gagged") or pl:GetVar("player_muted") then
+            if not pl:CBasePlayerController():IsValid() then return end
             return ReplyToCommand(playerid,
                 config:Fetch("admins.prefix"),
                 FetchTranslation("admins.silence.already"):gsub("{PLAYER_NAME}", pl:CBasePlayerController().PlayerName))
         end
 
+        if not pl:CBasePlayerController():IsValid() then return end
+        if not player:CBasePlayerController():IsValid() then return end
         local silenceMessage = FetchTranslation("admins.silence.message"):gsub("{ADMIN_NAME}",
             player and player:CBasePlayerController().PlayerName):gsub("{PLAYER_NAME}",
             pl:CBasePlayerController().PlayerName):gsub("{TIME}",
