@@ -2,9 +2,7 @@ AddEventHandler("OnPluginStart", function(event)
 	db = Database(config:Fetch("admins.connection_name"))
 	if not db:IsConnected() then return end
 
-	db:Query("CREATE TABLE `" ..
-		config:Fetch("admins.tablenames.comms") ..
-		"` (`id` INT NOT NULL AUTO_INCREMENT , `player_name` TEXT NOT NULL , `player_steamid` TEXT NOT NULL , `type` INT NOT NULL , `expiretime` INT NOT NULL , `length` INT NOT NULL , `reason` TEXT NOT NULL , `admin_name` TEXT NOT NULL , `admin_steamid` TEXT NOT NULL , `date` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP , `serverid` INT NOT NULL, PRIMARY KEY (`id`)) ENGINE = InnoDB;")
+	db:QueryParams("CREATE TABLE `@tablename` (`id` INT NOT NULL AUTO_INCREMENT , `player_name` TEXT NOT NULL , `player_steamid` TEXT NOT NULL , `type` INT NOT NULL , `expiretime` INT NOT NULL , `length` INT NOT NULL , `reason` TEXT NOT NULL , `admin_name` TEXT NOT NULL , `admin_steamid` TEXT NOT NULL , `date` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, PRIMARY KEY (`id`)) ENGINE = InnoDB;", { tablename = config:Fetch("admins.tablenames.comms") })
 
 	GenerateMenu()
 	return EventResult.Continue
@@ -16,15 +14,8 @@ AddEventHandler("OnPlayerConnectFull", function(event)
 	if not player then return end
 	if player:IsFakeClient() then return end
 
-	db:Query(
-		"select * from " ..
-		config:Fetch("admins.tablenames.comms") ..
-		" where (player_steamid = '" ..
-		tostring(player:GetSteamID()) ..
-		"') and serverid = " ..
-		config:Fetch("admins.serverid") ..
-		" and (expiretime = 0 OR expiretime - UNIX_TIMESTAMP() > 0) order by id limit 1",
-		function(err, result)
+	db:QueryParams("select * from @tablename where player_steamid = '@steamid' and (expiretime = 0 OR expiretime - UNIX_TIMESTAMP() > 0) order by id limit 1",
+		{ tablename = config:Fetch("admins.tablenames.comms"), steamid = player:GetSteamID() }, function(err, result)
 			if #err > 0 then return print("ERROR: " .. err) end
 
 			if #result > 0 then
@@ -73,7 +64,7 @@ AddEventHandler("OnClientChat", function(event, playerid, text, teamonly)
 	end
 
 	if player:GetVar("player_gagged") then
-		local duration = player:GetVar("player_gag_duration") - math.floor(GetTime() / 1000)
+		local duration = player:GetVar("player_gag_duration") - os.time()
 		if duration > 0 then
 			ReplyToCommand(playerid, config:Fetch("admins.prefix"),
 				FetchTranslation("admins.gag.try"):gsub("{TIME}", ComputePrettyTime(duration)))
@@ -95,7 +86,7 @@ SetTimer(10000, function()
 				-- [[ Gag Check ]]
 				if player:GetVar("player_gagged") then
 					if player:GetVar("player_gag_duration") ~= 0 then
-						local duration = player:GetVar("player_gag_duration") - math.floor(GetTime() / 1000)
+						local duration = player:GetVar("player_gag_duration") - os.time()
 						if duration <= 0 then
 							PerformCommUnban(player:GetSteamID(), CommsType.Gag)
 							ReplyToCommand(playerid, config:Fetch("admins.prefix"), FetchTranslation("admins.gag.expire"))
@@ -105,12 +96,11 @@ SetTimer(10000, function()
 				-- [[ Mute Check ]]
 				if player:GetVar("player_muted") then
 					if player:GetVar("player_mute_duration") ~= 0 then
-						local duration = player:GetVar("player_mute_duration") - math.floor(GetTime() / 1000)
+						local duration = player:GetVar("player_mute_duration") - os.time()
 						if duration <= 0 then
 							PerformCommUnban(player:GetSteamID(), CommsType.Mute)
 							player:SetVoiceFlags(VoiceFlagValue.Speak_Normal)
-							ReplyToCommand(playerid, config:Fetch("admins.prefix"),
-								FetchTranslation("admins.mute.expire"))
+							ReplyToCommand(playerid, config:Fetch("admins.prefix"), FetchTranslation("admins.mute.expire"))
 						end
 					end
 				end

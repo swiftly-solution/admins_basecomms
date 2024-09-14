@@ -57,14 +57,12 @@ commands:Register("mute", function(playerid, args, argc, silent, prefix)
         end
 
         if not targetPlayer:CBasePlayerController():IsValid() then return end
-        if not admin:CBasePlayerController():IsValid() then return end
         PerformCommBan(tostring(targetPlayer:GetSteamID()), targetPlayer:CBasePlayerController().PlayerName,
             admin and tostring(admin:GetSteamID()) or "0",
             admin and admin:CBasePlayerController().PlayerName or "CONSOLE", time * 60, reason, CommsType.Mute)
-        targetPlayer:SetVoiceFlags(VoiceFlagValue.Speak_Muted)
         local muteMessage = FetchTranslation("admins.mute.message"):gsub("{ADMIN_NAME}",
             admin and admin:CBasePlayerController().PlayerName or "CONSOLE"):gsub("{PLAYER_NAME}",
-            targetPlayer:CBasePlayerController().PlayerName):gsub("{TIME}", ComputePrettyTime(time)):gsub("{REASON}",
+            targetPlayer:CBasePlayerController().PlayerName):gsub("{TIME}", ComputePrettyTime(time * 60)):gsub("{REASON}",
             reason)
         for j = 1, playermanager:GetPlayerCap() do
             ReplyToCommand(j - 1, config:Fetch("admins.prefix"), muteMessage)
@@ -116,9 +114,7 @@ commands:Register("unmute", function(playerid, args, argc, silent, prefix)
         end
 
         if not targetPlayer:CBasePlayerController():IsValid() then return end
-        if not admin:CBasePlayerController():IsValid() then return end
         PerformCommUnban(targetPlayer:GetSteamID(), CommsType.Mute)
-        targetPlayer:SetVoiceFlags(VoiceFlagValue.Speak_Normal)
         ReplyToCommand(playerid, config:Fetch("admins.prefix"),
             FetchTranslation("admins.unmute.message"):gsub("{ADMIN_NAME}",
                 admin and admin:CBasePlayerController().PlayerName or "CONSOLE"):gsub("{PLAYER_NAME}",
@@ -185,13 +181,12 @@ commands:Register("gag", function(playerid, args, argc, silent, prefix)
         end
 
         if not targetPlayer:CBasePlayerController():IsValid() then return end
-        if not admin:CBasePlayerController():IsValid() then return end
         PerformCommBan(tostring(targetPlayer:GetSteamID()), targetPlayer:CBasePlayerController().PlayerName,
             admin and tostring(admin:GetSteamID()) or "0",
             admin and admin:CBasePlayerController().PlayerName or "CONSOLE", time * 60, reason, CommsType.Gag)
         local gagMessage = FetchTranslation("admins.gag.message"):gsub("{ADMIN_NAME}",
             admin and admin:CBasePlayerController().PlayerName or "CONSOLE"):gsub("{PLAYER_NAME}",
-            targetPlayer:CBasePlayerController().PlayerName):gsub("{TIME}", ComputePrettyTime(time)):gsub("{REASON}",
+            targetPlayer:CBasePlayerController().PlayerName):gsub("{TIME}", ComputePrettyTime(time * 60)):gsub("{REASON}",
             reason)
         for j = 1, playermanager:GetPlayerCap() do
             ReplyToCommand(j - 1, config:Fetch("admins.prefix"), gagMessage)
@@ -243,7 +238,6 @@ commands:Register("ungag", function(playerid, args, argc, silent, prefix)
         end
 
         if not targetPlayer:CBasePlayerController():IsValid() then return end
-        if not admin:CBasePlayerController():IsValid() then return end
         PerformCommUnban(targetPlayer:GetSteamID(), CommsType.Gag)
         ReplyToCommand(playerid, config:Fetch("admins.prefix"),
             FetchTranslation("admins.ungag.message"):gsub("{ADMIN_NAME}",
@@ -311,7 +305,6 @@ commands:Register("silence", function(playerid, args, argc, silent, prefix)
         end
 
         if not targetPlayer:CBasePlayerController():IsValid() then return end
-        if not admin:CBasePlayerController():IsValid() then return end
         PerformCommBan(tostring(targetPlayer:GetSteamID()), targetPlayer:CBasePlayerController().PlayerName,
             admin and tostring(admin:GetSteamID()) or "0",
             admin and admin:CBasePlayerController().PlayerName or "CONSOLE", time * 60, reason, CommsType.Gag)
@@ -370,10 +363,8 @@ commands:Register("unsilence", function(playerid, args, argc, silent, prefix)
         end
 
         if not targetPlayer:CBasePlayerController():IsValid() then return end
-        if not admin:CBasePlayerController():IsValid() then return end
         PerformCommUnban(targetPlayer:GetSteamID(), CommsType.Gag)
         PerformCommUnban(targetPlayer:GetSteamID(), CommsType.Mute)
-        targetPlayer:SetVoiceFlags(VoiceFlagValue.Speak_Normal)
         ReplyToCommand(playerid, config:Fetch("admins.prefix"),
             FetchTranslation("admins.unsilence.message"):gsub("{ADMIN_NAME}",
                 admin and admin:CBasePlayerController().PlayerName or "CONSOLE"):gsub("{PLAYER_NAME}",
@@ -583,7 +574,6 @@ commands:Register("addmutemenu_confirmbox", function(playerid, args, argc, silen
             player and player:CBasePlayerController().PlayerName or "CONSOLE",
             config:Fetch("admin_comms.times[" .. AddMuteMenuSelectedTime[playerid] .. "]"),
             AddMuteMenuSelectedReason[playerid], CommsType.Mute)
-        pl:SetVoiceFlags(VoiceFlagValue.Speak_Muted)
 
         for i = 1, playermanager:GetPlayerCap() do
             ReplyToCommand(i - 1, config:Fetch("admins.prefix"), muteMessage)
@@ -732,7 +722,7 @@ commands:Register("addgagmenu_selecttime", function(playerid, args, argc, silent
 
 
     menus:RegisterTemporary("addgagmenuadmintempplayerconfirm_" .. playerid,
-        string.format("%s - %s", FetchTranslation("admin.adminmenu.addgag"), FetchTranslation("admins.confirm")),
+        string.format("%s - %s", FetchTranslation("admins.adminmenu.addgag"), FetchTranslation("admins.confirm")),
         config:Fetch("admins.amenucolor"), options)
 
     player:HideMenu()
@@ -938,7 +928,7 @@ commands:Register("addsilencemenu_selecttime", function(playerid, args, argc, si
 
 
     menus:RegisterTemporary("addsilencemenuadmintempplayerconfirm_" .. playerid,
-        string.format("%s - %s", FetchTranslation("admin.adminmenu.addsilence"), FetchTranslation("admins.confirm")),
+        string.format("%s - %s", FetchTranslation("admins.adminmenu.addsilence"), FetchTranslation("admins.confirm")),
         config:Fetch("admins.amenucolor"), options)
 
     player:HideMenu()
